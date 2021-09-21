@@ -1,0 +1,99 @@
+{
+    "review": {
+        "object": {
+            "apiVersion": "argoproj.io/v1alpha1",
+            "kind": "Rollout",
+            "metadata": {
+                "name": "rollouts-demo",
+                "namespace": "demo"
+            },
+            "spec": {
+                "replicas": 5,
+                "revisionHistoryLimit": 2,
+                "selector": {
+                "matchLabels": {
+                    "app": "rollouts-demo"
+                }
+                },
+                "strategy": {
+                "canary": {
+                    "steps": [
+                    {
+                        "setWeight": 20
+                    },
+                    {
+                        "analysis": {
+                        "templates": [
+                            {
+                            "templateName": "application-is-still-worthy"
+                            }
+                        ]
+                        }
+                    },
+                    {
+                        "setWeight": 40
+                    },
+                    {
+                        "pause": {
+                        "duration": 5
+                        }
+                    },
+                    {
+                        "setWeight": 60
+                    },
+                    {
+                        "pause": {
+                        "duration": 5
+                        }
+                    },
+                    {
+                        "setWeight": 80
+                    },
+                    {
+                        "pause": {
+                        "duration": 5
+                        }
+                    }
+                    ]
+                }
+                },
+                "template": {
+                "metadata": {
+                    "labels": {
+                    "app": "rollouts-demo",
+                    "stage": "dev1",
+                    "tribe": "mycompany-12345"
+                    }
+                },
+                "spec": {
+                    "containers": [
+                    {
+                        "image": "argoproj/rollouts-demo:blue",
+                        "name": "rollouts-demo",
+                        "ports": [
+                        {
+                            "containerPort": 8080,
+                            "name": "http",
+                            "protocol": "TCP"
+                        }
+                        ],
+                        "resources": {
+                        "requests": {
+                            "cpu": "5m",
+                            "memory": "32Mi"
+                        }
+                        }
+                    }
+                    ]
+                }
+                }
+            }
+        }
+    },
+    "parameters": {
+        "labels": {
+            "tribe": "mycompany-12345",
+            "stage": "dev"
+        }
+    }
+}

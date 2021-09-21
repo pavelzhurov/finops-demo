@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mycloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mycloud
+  namespace: mycloud
+spec:
+  selector:
+    app: mycloud
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mycloud
+  namespace: mycloud
+  labels:
+    app: mycloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mycloud
+  template:
+    metadata:
+      labels:
+        app: mycloud
+    spec:
+      containers:
+      - name: mycloud
+        image: docker.io/pavelzhurov/mycloud:v0.1
+        ports:
+        - containerPort: 8081
+

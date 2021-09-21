@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: application-is-still-worthy
+  namespace: demo
+spec:
+  metrics:
+  - name: application-is-still-worthy
+    failureCondition: result[0] >= 0.015
+    interval: 30s
+    count: 10
+    provider:
+      prometheus:
+        address: "http://kubecost-prometheus-server.kubecost"
+        query: |
+          sum(container_memory_allocation_bytes{namespace="demo", pod=~"rollouts-demo-.*"})/1024/1024/1024 * ignoring(instance, job, node) node_ram_hourly_cost + {__name__=~"mycloud_db_[0-9]*_current_iops", tribe="mycompany-12345", stage="dev"} * ignoring(instance, job,stage,tribe) mycloud_db_cost + sum(container_cpu_allocation{namespace="demo", pod=~"rollouts-demo-.*"}) * ignoring(instance, job, node) node_cpu_hourly_cost
